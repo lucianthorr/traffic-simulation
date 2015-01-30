@@ -15,8 +15,7 @@ class Blackbox:
         self.history.append((self.time,location,speed))
 
 
-    def get_history(self):
-        print(self.history)
+    def get_full_history(self):
         times = []
         locations = []
         speeds = []
@@ -25,6 +24,21 @@ class Blackbox:
             locations.append(location)
             speeds.append(speed)
         return times, locations, speeds
+
+    def get_per_minute_history(self):
+        #print(self.history)
+        times = []
+        locations = []
+        speeds = []
+        for time, location, speed in self.history:
+            if time % 60 == 0:
+                times.append(time)
+                locations.append(location)
+                speeds.append(speed)
+        return times, locations, speeds
+
+    def get_current_time(self):
+        return self.time
 
 
     # Probably won't need, but just in case.
