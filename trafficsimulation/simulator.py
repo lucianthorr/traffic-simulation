@@ -8,50 +8,42 @@ from .road import Road
 
 class Simulator:
 
-    def __init__(self,meters_of_road=1000,max_cars=30,minutes=60):
-        self.meters_of_road = meters_of_road
-        self.max_cars = max_cars
+    def __init__(self,minutes=180):
         self.max_second = int(minutes * 60)
         self.current_second = 0
         self.trial_info = []
+        self.road = Road()
+        self.meters_of_road = len(self.road.road)
+        self.max_cars = int(self.meters_of_road/1000) * 30
 
 
-    def check_to_add_cars(self, new_car, cars):
-        """ Check for cars ahead and check for cars at the end of the circular
-        track. """
-        for car in cars:
-            if car.location - car.length < 20:
-                return False
-            elif self.meters_of_road - new_car.length - car.location < 20:
-                return False
-        else:
-            return True
+    def update_next_cars(self,cars):
+        for index,current_car in enumerate(cars):
+            min_distance = self.meters_of_road
+            for idx, next_car in enumerate(cars):
+                distance = (next_car.location - current_car.location - next_car.length)
+                if 0 < distance < min_distance:
+                    min_distance = distance % self.meters_of_road
+                    current_car.next_car = next_car
+            if min_distance == self.meters_of_road:
+                current_car.next_car = cars[0]
+
 
     def possibly_add_car(self,cars):
-        if len(cars) < self.max_cars:
-            new_car = Car(current_time=self.current_second)
-            if (self.check_to_add_cars(new_car, cars)
-                and random.random() < 0.1):
-                cars.insert(0,new_car)
-                """ Each car has a next_car pointer to the car in front of it.
-                If we are at max_cars, the first car's next_car points to
-                the very newest (and last) car. """
-                if 1 < len(cars) < self.max_cars:
-                    cars[0].next_car = cars[1]
-                elif len(cars) == self.max_cars:
-                    cars[self.max_cars-1].next_car = cars[0]
+        timing = int(self.meters_of_road / self.max_cars)
+        if len(cars) < self.max_cars and (self.current_second % timing) == 0:
+            new_car = Car(current_time=self.current_second,
+                          road=self.road,number=len(cars))
+            cars.insert(0,new_car)
+            """ Each car has a next_car pointer to the car in front of it.
+            If we are at max_cars, the first car's next_car points to
+            the very newest (and last) car. """
+            if 1 < len(cars) <= self.max_cars:
+                cars[0].next_car = cars[1]
+                cars[len(cars)-1].next_car = cars[0]
+            elif len(cars) == 1:
+                cars[0].next_car = cars[0]
         return cars
-
-    # Probably won't need.  Use in blackbox
-    # def normalize_history(self,history):
-    #     """Takes a car's history and adds the time before it existed"""
-    #     print(len(history))
-    #     original_time = history[0][0]
-    #     print(original_time)
-    #     for _ in range(original_time):
-    #         history.insert(0,(0,0))
-    #     print(len(history))
-    #     return history
 
 
     def start_simulation(self):
@@ -64,15 +56,15 @@ class Simulator:
             """ We want to move the cars but we want to move the car
             at the front of the list first so we iterate from top down. """
             for index,car in enumerate(cars):
+                #cars[index].move_for_one_second()
                 cars[len(cars)-index-1].move_for_one_second()
             self.current_second += 1
-
-        average_speeds = []
-        for index,car in enumerate(cars):
-            times, locations, speeds = car.blackbox.get_per_minute_history()
-            #print("Car {} average speed {}".format(len(cars)-index,statistics.mean(speeds)))
-            plt.scatter(times,locations)
-        plt.show()
+        # times = []
+        # locations = []
+        # speeds = []
+        # times, locations, speeds = cars[29].blackbox.get_full_history()
+        # for n in range(3600):
+        #     print("{}: {}: {}".format(times[n],locations[n],speeds[n]))
         return cars
 
     def run_trials(self,number_of_trials):
