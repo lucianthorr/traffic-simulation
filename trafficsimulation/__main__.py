@@ -13,4 +13,4 @@ if __name__ == '__main__':
     trials = simulation.run_trials(1)
     visualizer = Visualizer(trials)
     visualizer.get_averages(trials)
-    #visualizer.plot_traffic(trials[0])
+    visualizer.plot_traffic(trials[0])

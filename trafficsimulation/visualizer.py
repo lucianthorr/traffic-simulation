@@ -13,9 +13,11 @@ class Visualizer:
         for index,car in enumerate(trial):
             if index > 1000:
                 break
-            times, locations, speeds,distances = car.blackbox.get_per_minute_history()
-        #times, locations, speeds = trial[0].blackbox.get_full_history()
-            plt.scatter(times,locations)
+            times, locations, speeds, distances = car.blackbox.get_per_minute_history()
+        times, locations, speeds, distances = trial[0].blackbox.get_full_history()
+        for n in range(len(times)):
+            print("{}: Loc:{} Speed:{} Dist:{}".format(times[n],locations[n],speeds[n],distances[n]))
+        plt.scatter(times,locations)
         plt.show()
 
     def get_averages(self, trials):

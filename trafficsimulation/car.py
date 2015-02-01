@@ -40,7 +40,7 @@ class Car:
 
     def accelerate(self):
         road_condition = self.road.get_chance_of_slowing(int(self.location))
-        if random.random() < (0.1 * road_condition) and self.test_time:
+        if random.random() < (0.1 * road_condition):
             self.speed -= 2
         elif self.speed < self.max_speed:
             self.speed += 2
@@ -52,16 +52,21 @@ class Car:
 
     def move_for_one_second(self):
         self.speed = self.accelerate()
+        dist_speed = ((self.next_car.location - self.location - self.length)
+                      % self.road_length)
+        next_speed = self.next_car.speed
+        adjusted_speed = min([dist_speed,next_speed])
         # Tentatively move the car ahead and check for conflict
         original_location = self.location
         if self.speed <= self.distance_to_next_car():
             self.location = (original_location + self.speed) % self.road_length
             if self.distance_to_next_car() < self.length*4:
-                self.location = (original_location + self.next_car.speed) % self.road_length
-                self.speed = self.next_car.speed
+                self.location = ((original_location + adjusted_speed)
+                                 % self.road_length)
+                self.speed = adjusted_speed
         else:
-             self.location = (original_location + self.next_car.speed) % self.road_length
-             self.speed = self.next_car.speed
+             self.location = (original_location + adjusted_speed) % self.road_length
+             self.speed = adjusted_speed
 
         # Update car's history
         self.blackbox.update((self.location,self.speed,self.distance_to_next_car()))
