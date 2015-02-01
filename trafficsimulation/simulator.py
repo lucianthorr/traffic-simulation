@@ -8,32 +8,21 @@ from .road import Road
 
 class Simulator:
 
-    def __init__(self,minutes=120):
+    def __init__(self,minutes=60):
         self.max_second = int(minutes * 60)
         self.current_second = 0
         self.trial_info = []
         self.road = Road()
         self.meters_of_road = len(self.road.road)
-        self.max_cars = (int(self.meters_of_road/1000) * 30)
+        self.max_cars = (int(self.meters_of_road/1000) * 30)-1
 
-
-    def update_next_cars(self,cars):
-        for index,current_car in enumerate(cars):
-            min_distance = self.meters_of_road
-            for idx, next_car in enumerate(cars):
-                distance = (next_car.location - current_car.location - next_car.length)
-                if 0 < distance < min_distance:
-                    min_distance = distance % self.meters_of_road
-                    current_car.next_car = next_car
-            if min_distance == self.meters_of_road:
-                current_car.next_car = cars[0]
 
 
     def car_check(self,cars):
         """ Test method to be sure the sum of all car lengths + the distances
         between cars == the length of the road. If not, there's an error in the
         car generation frequency. """
-        size = len(cars) * 5
+        size = 0
         for idx, car in enumerate(cars):
             size += car.distance_to_next_car()
         return size
@@ -60,12 +49,18 @@ class Simulator:
             """ We want to move the cars but we want to move the car
             at the front of the list first so we iterate from top down. """
             for car in cars:
-                cars[index].generate_speed()
+                car.generate_speed()
             for car in cars:
-                cars[index].move()
+                car.move()
+            for index,car in enumerate(cars):
+                cars[len(cars)-index-1].resolve()
+
             self.current_second += 1
-
-
+            for car in cars:
+                car.blackbox.update((car.location,car.speed,car.distance_to_next_car()))
+            if self.car_check(cars) > self.meters_of_road + 1:
+                print("Error: cars passing.")
+                return
         return cars
 
     def run_trials(self,number_of_trials):

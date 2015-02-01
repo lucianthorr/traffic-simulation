@@ -19,23 +19,24 @@ class Car:
     def __str__(self):
         print("Location: {} Speed: {}".format(self.location,self.speed))
 
-    def set_location(self,location):
-        """ Location is the location of the FRONT of the car. """
-        self.location = location % self.road_length
-
-    def set_next_car(self,next_car):
-        """ Next car is the car ahead of this car. """
-        self.next_car = next_car
-
     def distance_to_next_car(self):
         """ Distance to next car is the distance from next car's location
         minus this location MINUS the length of the next car. """
-        distance = (self.next_car.location - self.location - self.next_car.length)
+        distance = (self.next_car.location - self.location)
         if distance <= 0:
             distance = ((self.road_length - self.location) +
-                        self.next_car.location - self.next_car.length)
-        #if distance % self.road_length > 6000:
-        #    print("here too",self.location,"   ",self.next_car.location)
+                        self.next_car.location)
+        # Check for a pass
+        if (self.road_length - self.next_car.location < 100 and
+            self.location < 34):
+            print(self.location," ",self.next_car.location)
+            print(distance, " ", self.road_length)
+            distance = distance - self.road_length
+        if 500 > (self.location - self.next_car.location) >= -5:
+            print(self.location," ",self.next_car.location)
+            return self.location - self.next_car.location
+        if (distance % self.road_length) > 500:
+            print("Self {} Next {}".format(self.location,self.next_car.location))
         return (distance % self.road_length)
 
     def accelerate(self):
@@ -50,23 +51,41 @@ class Car:
             self.speed = 0
         return self.speed
 
-    def move_for_one_second(self):
-        self.speed = self.accelerate()
-        dist_speed = ((self.next_car.location - self.location - self.length)
-                      % self.road_length)
-        next_speed = self.next_car.speed
-        adjusted_speed = min([dist_speed,next_speed])
-        # Tentatively move the car ahead and check for conflict
-        original_location = self.location
-        if self.speed <= self.distance_to_next_car():
-            self.location = (original_location + self.speed) % self.road_length
-            if self.distance_to_next_car() < self.length*4:
-                self.location = ((original_location + adjusted_speed)
-                                 % self.road_length)
-                self.speed = adjusted_speed
+    def too_close(self):
+        safe_zone = self.length*5
+        if self.speed >= self.distance_to_next_car()+self.next_car.speed-safe_zone:
+            return True
         else:
-             self.location = (original_location + adjusted_speed) % self.road_length
-             self.speed = adjusted_speed
+            return False
 
-        # Update car's history
-        self.blackbox.update((self.location,self.speed,self.distance_to_next_car()))
+    def generate_speed(self):
+        self.speed = self.accelerate()
+        while self.too_close() and self.speed > 1:
+            self.speed -= 1
+
+    def move(self):
+        self.location = (self.location + self.speed)%self.road_length
+
+
+    def passed_next(self):
+        # Check if self is at end of track and next is across
+        if (self.road_length - self.location < 100 and
+            self.next_car.location < 34):
+            return False
+        elif (self.road_length - self.next_car.location < 100 and
+              self.location < 34):
+              print("pass")
+              print("Loc {} Next {}".format(self.location,self.next_car.location))
+              return True
+        # Check for a standard pass.
+        if 100 > self.location - self.next_car.location > -20:
+            return True
+            print("pass easy")
+        else:
+            return False
+
+    def resolve(self):
+        safe_zone = self.length*5
+        while self.passed_next():
+            self.location = (self.location - 1) % self.road_length
+            self.speed -= 1
