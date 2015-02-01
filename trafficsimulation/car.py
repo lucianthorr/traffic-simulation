@@ -2,19 +2,19 @@ from blackbox import Blackbox
 import random
 
 class Car:
-    def __init__(self,length=5,speed=0,
+    def __init__(self,length=5,speed=0,location=0,
                  current_time=0,road=None,number=-1):
         self.number = number
         self.length = length
-        self.speed = (100/3)
-        self.location = 0
+        self.speed = speed
+        self.location = location
         self.next_car = 0
         self.max_speed = (100/3) #meters/second
         self.distance_from_car_ahead = 0
         self.blackbox = Blackbox(-1,self.location,self.speed)
         self.road = road
         self.road_length = len(self.road.road)
-        self.test_time = False
+
 
     def __str__(self):
         print("Location: {} Speed: {}".format(self.location,self.speed))

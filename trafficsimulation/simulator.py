@@ -53,39 +53,36 @@ class Simulator:
         car generation frequency. """
         size = len(cars) * 5
         for idx, car in enumerate(cars):
-            #print(car.distance_to_next_car())
             if car.distance_to_next_car() > self.meters_of_road - car.length:
                 for car in cars:
-                    #print("Car {}: Location: {} Distance: {}".format(car.number,car.location,car.distance_to_next_car()))
                     size += car.distance_to_next_car()
         return size
+
+    def generate_cars(self):
+        cars = []
+        spacing = self.meters_of_road/self.max_cars
+        for n in range(self.max_cars):
+            cars.append(Car(number=n,location=n*spacing,road=self.road))
+            try:
+                cars[n].next_car = cars[n+1]
+            except:
+                cars[n].next_car = cars[0]
+        return cars
 
     def start_simulation(self):
         """ Runs the simulation and returns the list of cars in order to plot
         data later. """
-        cars = []
+        cars = self.generate_cars()
         self.current_second = 0
         while self.current_second < self.max_second:
-            cars = self.add_car(cars)
+            #cars = self.add_car(cars)
             """ We want to move the cars but we want to move the car
             at the front of the list first so we iterate from top down. """
             for index,car in enumerate(cars):
-                #cars[index].move_for_one_second()
                 cars[len(cars)-index-1].move_for_one_second()
             self.current_second += 1
 
-            if self.car_check(cars) > (self.meters_of_road + 1):
-                #for car in cars:
-                #    print("#{} Location: {} Speed:{} Distance to Next: {}".format(car.number,car.location,car.speed,car.distance_to_next_car()))
-                #    if(car.distance_to_next_car() > 6000):
-                #        print("Loc of next: {}".format(car.next_car.location))
-                print("new distance to old = {}".format(cars[0].distance_to_next_car()))
-                print("old distance to new = {}".format(cars[len(cars)-1].distance_to_next_car()))
-        #time,location,speed,distance = cars[209].blackbox.get_full_history()
-        #for n in range(len(time)):
-        #    print("T: {}\tLoc: {}\tSpeed: {}\tDis: {}".format(time[n],location[n],speed[n],distance[n]))
-                #return
-        #print(len(cars))
+
         return cars
 
     def run_trials(self,number_of_trials):
