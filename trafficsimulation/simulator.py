@@ -10,7 +10,9 @@ class Simulator:
 
     def __init__(self,minutes=60):
         self.max_second = int(minutes * 60)
+        self.max_tenth = self.max_second * 10
         self.current_second = 0
+        self.current_tenth = 0
         self.trial_info = []
         self.road = Road()
         self.meters_of_road = len(self.road.road)
@@ -25,7 +27,12 @@ class Simulator:
         size = 0
         for idx, car in enumerate(cars):
             size += car.distance_to_next_car()
-        return size
+        if size > self.meters_of_road + 1:
+            print("Size = {}".format(size))
+            return True
+        else:
+            return False
+
 
     def generate_cars(self):
         cars = []
@@ -44,21 +51,24 @@ class Simulator:
         data later. """
         cars = self.generate_cars()
         self.current_second = 0
+        self.current_tenth = 0
 
         while self.current_second < self.max_second:
+        #while self.current_tenth < self.max_tenth:
             """ We want to move the cars but we want to move the car
             at the front of the list first so we iterate from top down. """
             for car in cars:
                 car.generate_speed()
             for car in cars:
                 car.original_move()
-            for index,car in enumerate(cars):
-                cars[len(cars)-index-1].resolve()
+            #for index,car in enumerate(cars):
+            #    cars[len(cars)-index-1].resolve()
 
             self.current_second += 1
+            self.current_tenth += 1
             for car in cars:
                 car.blackbox.update((car.location,car.speed,car.distance_to_next_car()))
-            if self.car_check(cars) > self.meters_of_road + 1:
+            if self.car_check(cars):
                 print("Error: cars passing.")
                 return
         return cars

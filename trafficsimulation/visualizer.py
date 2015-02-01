@@ -17,16 +17,17 @@ class Visualizer:
         times, locations, speeds, distances = trial[0].blackbox.get_full_history()
         #for n in range(len(times)):
         #    print("{}: Loc:{} Speed:{} Dist:{}".format(times[n],locations[n],speeds[n],distances[n]))
-        plt.scatter(times,locations)
+        plt.scatter(times[::10],locations[::10])
         plt.show()
 
     def get_averages(self, trials):
         trial_averages = []
+        print(len(trials))
         for trial in trials:
             car_averages = []
             for car in trial:
                 time,location,speed, distance = car.blackbox.get_full_history()
-                car_averages.append(statistics.mean(speed[120:]))
+                car_averages.append(statistics.mean(speed[1200::10]))
             #print(statistics.mean(car_averages))
             #print(statistics.stdev(car_averages))
             trial_averages.append(statistics.mean(car_averages))
