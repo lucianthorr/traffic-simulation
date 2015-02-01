@@ -5,7 +5,7 @@ class Road:
         self.road = []
         for n in range(1000):
             self.road.append(1.0)
-        for n in range(1000):
+        """for n in range(1000):
             self.road.append(1.4)
         for n in range(1000):
             self.road.append(1.0)
@@ -16,7 +16,7 @@ class Road:
         for n in range(1000):
             self.road.append(1.2)
         for n in range(1000):
-            self.road.append(1.0)
+            self.road.append(1.0)"""
 
     def get_chance_of_slowing(self,location):
         return self.road[location]

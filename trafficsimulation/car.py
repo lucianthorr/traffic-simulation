@@ -3,17 +3,18 @@ import random
 
 class Car:
     def __init__(self,length=5,speed=0,
-                 current_time=0,road=None,number=999):
+                 current_time=0,road=None,number=-1):
         self.number = number
         self.length = length
-        self.speed = speed
+        self.speed = (100/3)
         self.location = 0
         self.next_car = 0
         self.max_speed = (100/3) #meters/second
         self.distance_from_car_ahead = 0
-        self.blackbox = Blackbox(current_time,self.location,self.speed)
+        self.blackbox = Blackbox(-1,self.location,self.speed)
         self.road = road
         self.road_length = len(self.road.road)
+        self.test_time = False
 
     def __str__(self):
         print("Location: {} Speed: {}".format(self.location,self.speed))
@@ -30,14 +31,16 @@ class Car:
         """ Distance to next car is the distance from next car's location
         minus this location MINUS the length of the next car. """
         distance = (self.next_car.location - self.location - self.next_car.length)
-        if distance < 0:
+        if distance <= 0:
             distance = ((self.road_length - self.location) +
                         self.next_car.location - self.next_car.length)
+        #if distance % self.road_length > 6000:
+        #    print("here too",self.location,"   ",self.next_car.location)
         return (distance % self.road_length)
 
     def accelerate(self):
         road_condition = self.road.get_chance_of_slowing(int(self.location))
-        if random.random() < (0.1 * road_condition):
+        if random.random() < (0.1 * road_condition) and self.test_time:
             self.speed -= 2
         elif self.speed < self.max_speed:
             self.speed += 2
@@ -51,25 +54,14 @@ class Car:
         self.speed = self.accelerate()
         # Tentatively move the car ahead and check for conflict
         original_location = self.location
-        if self.speed < self.distance_to_next_car():
+        if self.speed <= self.distance_to_next_car():
             self.location = (original_location + self.speed) % self.road_length
-            if (self.distance_to_next_car() < 100):
-                dist_speed = (self.next_car.location - self.location)%self.road_length
-                loc_speed = (original_location + self.next_car.speed) % self.road_length
-                self.speed = min([dist_speed,loc_speed])
-                self.speed = 0
-                self.location = (original_location + self.speed) % self.road_length
-                #self.location = (original_location + self.next_car.speed) % self.road_length
-                #self.speed = self.next_car.speed
-
+            if self.distance_to_next_car() < self.length*4:
+                self.location = (original_location + self.next_car.speed) % self.road_length
+                self.speed = self.next_car.speed
         else:
-            dist_speed = (self.next_car.location - self.location)%self.road_length
-            loc_speed = (original_location + self.next_car.speed) % self.road_length
-            self.speed = min([dist_speed,loc_speed])
-            self.speed = 0
-            self.location = (original_location + self.speed) % self.road_length
-            # self.location = (original_location + self.next_car.speed) % self.road_length
-            # self.speed = self.next_car.speed
+             self.location = (original_location + self.next_car.speed) % self.road_length
+             self.speed = self.next_car.speed
 
         # Update car's history
-        self.blackbox.update((self.location,self.speed))
+        self.blackbox.update((self.location,self.speed,self.distance_to_next_car()))
