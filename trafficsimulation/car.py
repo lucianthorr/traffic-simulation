@@ -23,20 +23,23 @@ class Car:
         """ Distance to next car is the distance from next car's location
         minus this location MINUS the length of the next car. """
         distance = (self.next_car.location - self.location)
-        if distance <= 0:
+        if (distance <= 0 and self.location > 900 and
+                              self.next_car.location < 100):
             distance = ((self.road_length - self.location) +
                         self.next_car.location)
         # Check for a pass
         if (self.road_length - self.next_car.location < 100 and
             self.location < 34):
-            print(self.location," ",self.next_car.location)
-            print(distance, " ", self.road_length)
-            distance = distance - self.road_length
-        if 500 > (self.location - self.next_car.location) >= -5:
-            print(self.location," ",self.next_car.location)
-            return self.location - self.next_car.location
-        if (distance % self.road_length) > 500:
-            print("Self {} Next {}".format(self.location,self.next_car.location))
+            #print("Pass1",self.location," ",self.next_car.location)
+            #print("Pass1",distance, " ", self.road_length)
+            return distance - self.road_length
+        # If self is ahead of next (>0)
+        # but not so far that its really behind (<500)
+        if 0 < (self.location - self.next_car.location) < 500:
+             print(self.location,"->",self.next_car.location)
+             print(self.location - self.next_car.location)
+             return -1 * (self.location - self.next_car.location)
+
         return (distance % self.road_length)
 
     def accelerate(self):
@@ -67,25 +70,14 @@ class Car:
         self.location = (self.location + self.speed)%self.road_length
 
 
-    def passed_next(self):
-        # Check if self is at end of track and next is across
-        if (self.road_length - self.location < 100 and
-            self.next_car.location < 34):
-            return False
-        elif (self.road_length - self.next_car.location < 100 and
-              self.location < 34):
-              print("pass")
-              print("Loc {} Next {}".format(self.location,self.next_car.location))
-              return True
-        # Check for a standard pass.
-        if 100 > self.location - self.next_car.location > -20:
+    def moved_too_far(self):
+        safe_zone = self.length*5
+        if self.distance_to_next_car() <= safe_zone :
             return True
-            print("pass easy")
         else:
             return False
 
     def resolve(self):
-        safe_zone = self.length*5
-        while self.passed_next():
+        while self.moved_too_far() and self.speed>0:
             self.location = (self.location - 1) % self.road_length
             self.speed -= 1
