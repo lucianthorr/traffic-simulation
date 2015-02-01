@@ -15,8 +15,8 @@ class Visualizer:
                 break
             times, locations, speeds, distances = car.blackbox.get_per_minute_history()
         times, locations, speeds, distances = trial[0].blackbox.get_full_history()
-        for n in range(len(times)):
-            print("{}: Loc:{} Speed:{} Dist:{}".format(times[n],locations[n],speeds[n],distances[n]))
+        #for n in range(len(times)):
+        #    print("{}: Loc:{} Speed:{} Dist:{}".format(times[n],locations[n],speeds[n],distances[n]))
         plt.scatter(times,locations)
         plt.show()
 

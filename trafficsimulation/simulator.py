@@ -51,7 +51,7 @@ class Simulator:
             for car in cars:
                 car.generate_speed()
             for car in cars:
-                car.move()
+                car.original_move()
             for index,car in enumerate(cars):
                 cars[len(cars)-index-1].resolve()
 

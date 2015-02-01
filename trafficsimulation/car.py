@@ -36,8 +36,8 @@ class Car:
         # If self is ahead of next (>0)
         # but not so far that its really behind (<500)
         if 0 < (self.location - self.next_car.location) < 500:
-             print(self.location,"->",self.next_car.location)
-             print(self.location - self.next_car.location)
+             #print(self.location,"->",self.next_car.location)
+             #print(self.location - self.next_car.location)
              return -1 * (self.location - self.next_car.location)
 
         return (distance % self.road_length)
@@ -81,3 +81,16 @@ class Car:
         while self.moved_too_far() and self.speed>0:
             self.location = (self.location - 1) % self.road_length
             self.speed -= 1
+
+    def original_move(self):
+        self.speed = self.accelerate()
+        # Tentatively move the car ahead and check for conflict
+        original_location = self.location
+        if self.speed <= self.distance_to_next_car():
+            self.location = (original_location + self.speed) % self.road_length
+            if self.distance_to_next_car() < self.length*5:
+                self.location = (original_location + self.next_car.speed) % self.road_length
+                self.speed = self.next_car.speed
+        else:
+             self.location = (original_location + self.next_car.speed) % self.road_length
+             self.speed = self.next_car.speed
