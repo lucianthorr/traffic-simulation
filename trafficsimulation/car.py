@@ -37,6 +37,11 @@ class Car:
         else:
             return False, None
 
+    @property
+    def distance(self):
+        return self.distance_to_next_car()
+
+
     def distance_to_next_car(self):
         """ Distance to next car is the distance from next car's location
         minus this location MINUS the length of the next car.
@@ -73,13 +78,13 @@ class Car:
             If so, moves back to the original location and moves again at
             a slower rate. """
         self.speed = self.accelerate()
-        dist_speed = self.distance_to_next_car()-5
+        dist_speed = self.distance - 5
         min_speed = min([x for x in [dist_speed, self.next_car.speed] if x >= 0])
         # Tentatively move the car ahead and check for conflict
         original_location = self.location
-        if (self.speed) <= self.distance_to_next_car()-5:
+        if (self.speed) <= self.distance - 5:
             self.location = (original_location + self.speed) % self.road_length
-            if self.distance_to_next_car() < self.length*5:
+            if self.distance < self.length * 5:
                 self.location = (original_location + min_speed) % self.road_length
                 self.speed = min_speed
         else:

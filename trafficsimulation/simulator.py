@@ -14,8 +14,8 @@ class Simulator:
         self.trial_info = []
         self.road = Road()
         self.meters_of_road = len(self.road.road)
-        self.max_cars = ((int(self.meters_of_road/1000) * 30)
-                        -int(self.meters_of_road/1000))
+        self.max_cars = (int(self.meters_of_road/1000) * 30)
+                        #-int(self.meters_of_road/1000))
 
 
 
@@ -56,12 +56,16 @@ class Simulator:
         while self.current_second < self.max_second:
             """ We want to move the cars but we want to move the car
             at the front of the list first so we iterate from top down. """
-            for idx,car in enumerate(cars):
-                cars[len(cars)-idx-1].move()
+            #print("BREAK---------------------")
+            sorted_cars = sorted(cars, key=lambda car: car.distance, reverse=True)
+            for car in sorted_cars:
+            #    print("{}: {} {}".format(car.number,car.location,car.distance))
+                car.move()
+            #    print("{}: {} {}*".format(car.number,car.location,car.distance))
 
             self.current_second += 1
             for car in cars:
-                car.blackbox.update((car.location,car.speed,car.distance_to_next_car()))
+                car.blackbox.update((car.location,car.speed,car.distance))
             if self.car_check(cars):
                 print("Error: cars passing.")
                 return
