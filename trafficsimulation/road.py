@@ -1,6 +1,7 @@
 
 class Road:
-
+    """ Simply stores a list of numbers used to
+    determine the car's chance of slowing."""
     def __init__(self):
         self.road = []
         for n in range(1000):

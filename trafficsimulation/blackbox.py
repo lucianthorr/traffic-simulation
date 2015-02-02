@@ -9,6 +9,7 @@ class Blackbox:
 
 
     def update(self,stat_tuple):
+        """ Appends a new tuple of data to the history list. """
         self.time += 1
         location = stat_tuple[0]
         speed = stat_tuple[1]
@@ -18,6 +19,7 @@ class Blackbox:
 
 
     def get_full_history(self):
+        """ Returns the car's entire data storage. """
         times = []
         locations = []
         speeds = []
@@ -30,7 +32,7 @@ class Blackbox:
         return times, locations, speeds, distances
 
     def get_per_minute_history(self):
-        #print(self.history)
+        " Returns one second of data for every 60 seconds. """
         times = []
         locations = []
         speeds = []
@@ -45,11 +47,3 @@ class Blackbox:
 
     def get_current_time(self):
         return self.time
-
-
-    # Probably won't need, but just in case.
-    # def normalize_history(self):
-    #     original_time = self.history[0][0][0]
-    #     for _ in range(original_time):
-    #         self.history.insert(0,(0,0,0))
-    #     return self.history

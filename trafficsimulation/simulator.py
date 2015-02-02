@@ -34,6 +34,8 @@ class Simulator:
 
 
     def generate_cars(self):
+        """ Generates all cars at once
+        and evenly distributes them along the track. """
         cars = []
         spacing = self.meters_of_road/(self.max_cars)
         for n in range(self.max_cars):

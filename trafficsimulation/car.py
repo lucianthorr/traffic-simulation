@@ -2,6 +2,11 @@ from blackbox import Blackbox
 import random
 
 class Car:
+    """ The Car is the workhorse class of this project.  Each car keeps track of its location, speed,
+    and uses a Road object to get changes in the environment.
+    Also, each car has a Car attribute that points to the car ahead of it.
+    This is used to manage moving."""
+
     def __init__(self,length=5,speed=0,location=0,
                  current_time=0,road=None,number=-1):
         self.number = number
@@ -34,7 +39,9 @@ class Car:
 
     def distance_to_next_car(self):
         """ Distance to next car is the distance from next car's location
-        minus this location MINUS the length of the next car. """
+        minus this location MINUS the length of the next car.
+        This will return a negative distance if we have accidentally passed the car
+        ahead. """
         distance = (self.next_car.location - self.location)
         if distance < 0:
             distance = ((self.road_length - self.location) +
@@ -47,6 +54,8 @@ class Car:
             return distance
 
     def accelerate(self):
+        """ Accelerate uses the Road object to change its
+            probability of slowing. """
         road_condition = self.road.get_chance_of_slowing(int(self.location))
         if random.random() < (0.1 * road_condition):
             self.speed -= 2
@@ -59,11 +68,10 @@ class Car:
         return self.speed
 
 
-    #def move(self):
-    #    self.location = (self.location + self.speed)%self.road_length
-
-
     def move(self):
+        """ Moves the car ahead and looks for conflict.
+            If so, moves back to the original location and moves again at
+            a slower rate. """
         self.speed = self.accelerate()
         dist_speed = self.distance_to_next_car()-5
         min_speed = min([x for x in [dist_speed, self.next_car.speed] if x >= 0])
