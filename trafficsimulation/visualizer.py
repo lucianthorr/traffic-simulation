@@ -22,7 +22,6 @@ class Visualizer:
 
     def get_averages(self, trials):
         trial_averages = []
-        print(len(trials))
         for trial in trials:
             car_averages = []
             for car in trial:
