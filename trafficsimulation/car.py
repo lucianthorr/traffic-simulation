@@ -24,8 +24,8 @@ class Car:
         # but not so far that its really behind (<500)
         if 0 < (self.location - self.next_car.location) < 500:
              return True, self.next_car.location - self.location
-        elif (self.road_length - self.next_car.location < 100 and
-            self.location < 34):
+        elif (self.road_length - self.next_car.location < 50 and
+            self.location < 50):
 
             return True, -1 * ((self.road_length - self.next_car.location)
                           + self.location)
@@ -49,44 +49,21 @@ class Car:
     def accelerate(self):
         road_condition = self.road.get_chance_of_slowing(int(self.location))
         if random.random() < (0.1 * road_condition):
-            self.speed -= .2
+            self.speed -= 2
         elif self.speed < self.max_speed:
-            self.speed += .2
+            self.speed += 2
         if self.speed > self.max_speed:
             self.speed = self.max_speed
         elif self.speed < 0:
             self.speed = 0
         return self.speed
 
-    def too_close(self):
-        safe_zone = self.length*5
-        if self.speed >= self.distance_to_next_car()+self.next_car.speed-safe_zone:
-            return True
-        else:
-            return False
 
-    def generate_speed(self):
-        self.speed = self.accelerate()
-        while self.too_close() and self.speed > 1:
-            self.speed -= 1
+    #def move(self):
+    #    self.location = (self.location + self.speed)%self.road_length
+
 
     def move(self):
-        self.location = (self.location + self.speed)%self.road_length
-
-
-    def moved_too_far(self):
-        safe_zone = self.length*5
-        if self.distance_to_next_car() <= safe_zone :
-            return True
-        else:
-            return False
-
-    def resolve(self):
-        while self.moved_too_far() and self.speed>0:
-            self.location = (self.location - 1) % self.road_length
-            self.speed -= 1
-
-    def original_move(self):
         self.speed = self.accelerate()
         dist_speed = self.distance_to_next_car()-5
         min_speed = min([x for x in [dist_speed, self.next_car.speed] if x >= 0])

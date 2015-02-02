@@ -27,9 +27,7 @@ class Visualizer:
             car_averages = []
             for car in trial:
                 time,location,speed, distance = car.blackbox.get_full_history()
-                car_averages.append(statistics.mean(speed[1200::10]))
-            #print(statistics.mean(car_averages))
-            #print(statistics.stdev(car_averages))
+                car_averages.append(statistics.mean(speed[1200::]))
             trial_averages.append(statistics.mean(car_averages))
         print(statistics.mean(trial_averages))
         return statistics.mean(trial_averages)
